@@ -15,7 +15,7 @@ def main():
     image_dir = "./data/train_clf"
     label_dir = "./data/labels.csv"
     # Specify which checkpoint to use
-    cae_ckpt_path = "checkpoint/20_cae.pth"
+    cae_ckpt_path = "checkpoint/30_cae.pth"
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if torch.cuda.is_available():
@@ -44,9 +44,9 @@ def main():
     test_size = len(full_dataset) - train_size
     train_dataset, test_dataset = torch.utils.data.random_split(full_dataset, [train_size, test_size])
 
-    train_size = int(0.9*len(train_dataset))
-    val_size = len(train_dataset) - train_size
-    train_dataset, val_dataset = torch.utils.data.random_split(train_dataset, [train_size, val_size])
+    test_size = int(0.5*len(test_dataset))
+    val_size = len(test_dataset) - test_size
+    test_dataset, val_dataset = torch.utils.data.random_split(test_dataset, [test_size, val_size])
 
     train_loader = DataLoader(train_dataset, batch_size=32)
     valid_loader = DataLoader(val_dataset, batch_size=32)
@@ -56,7 +56,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = nn.CrossEntropyLoss()
 
-    n_epoch = 20
+    n_epoch = 10
     step = 0
     ckpt_path = "/cluster/scratch/zhiychen/DeepPainter/checkpoint" if torch.cuda.is_available() else './checkpoint'
     os.makedirs(ckpt_path, exist_ok=True)
@@ -84,14 +84,14 @@ def main():
         model.eval()
 
         with torch.no_grad():
+            n_correct = 0
             for batch in valid_loader:
                 input, label = batch
                 output = model(input)
-                loss = criterion(output, label)
+                n_correct += compute_n_correct(label.cpu(), output.cpu())
                 batch_count += len(input)
-                total_loss += loss.item() * len(input)
 
-        valid_loss = total_loss / batch_count
+        valid_loss = - n_correct / batch_count
         wandb.log({"Valid_loss": valid_loss, "Epochs": epoch})
 
         # for early stopping

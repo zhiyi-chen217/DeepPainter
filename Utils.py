@@ -78,8 +78,9 @@ class CNNClf(nn.Module):
         self.encoder.to(device)
 
         self.fc = nn.Sequential(
-            nn.AdaptiveAvgPool2d((1, 1)),
+            # nn.AdaptiveAvgPool2d((1, 1)),
             nn.Flatten(),
+            nn.Dropout(),
             nn.Linear(200*64*64, 400),
             act_fn,
             nn.Linear(400, 200),
