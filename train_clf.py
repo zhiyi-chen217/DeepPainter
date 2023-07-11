@@ -15,7 +15,7 @@ def main():
     image_dir = "./data/train_clf"
     label_dir = "./data/labels.csv"
     # Specify which checkpoint to use
-    cae_ckpt_path = "checkpoint/10_cae.pth"
+    cae_ckpt_path = "checkpoint/20_cae.pth"
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if torch.cuda.is_available():
