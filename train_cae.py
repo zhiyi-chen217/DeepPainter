@@ -42,7 +42,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = nn.MSELoss()
 
-    n_epoch = 30
+    n_epoch = 12
     step = 0
 
     # Check and specify the checkpoint path
